@@ -8,6 +8,8 @@ Usages:
     python visualize_point_clouds.py --pcd_path path --viz open3d
     python visualize_point_clouds.py --pcd_path path --viz pptk
 """
+import os
+import sys
 import argparse
 import open3d as o3d
 import pptk
@@ -19,8 +21,13 @@ import pptk
 
 def main(pcd_path, viz):
     print('Loading Point Cloud... \n')
-    pcd = o3d.io.read_point_cloud(pcd_path)
-
+    if os.path.exists(pcd_path):
+        pcd = o3d.io.read_point_cloud(pcd_path)
+    else:
+        print('Path does not exist! \n')
+        print('Exiting... \n')
+        sys.exit()
+        
     print(pcd)
     # print(np.asarray(pcd.points))
 

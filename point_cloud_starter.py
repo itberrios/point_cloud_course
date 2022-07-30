@@ -17,7 +17,8 @@ import matplotlib.pyplot as plt
 
 ## CHALLENGE 1 - OPEN A FILE OF YOUR CHOICE AND VISUALIZE THE POINT CLOUD
 # The supported extension names are: pcd, ply, xyz, xyzrgb, xyzn, pts.
-pcd = 
+pcd_path = 
+pcd = o3d.io.read_point_cloud(pcd_path)
 
 ## IF YOU HAVE PPTK INSTALLED, VISUALIZE USING PPTK
 #import pptk
