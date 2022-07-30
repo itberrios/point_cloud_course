@@ -36,6 +36,7 @@ open3d.__version__
 ```
 pip install pptk
 ```
+NOTE: pptk is not currently supported for any Python versions above 3.7
 
 The course will work on:
 * Ubuntu 18.04+
