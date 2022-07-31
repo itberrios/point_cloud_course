@@ -13,7 +13,9 @@ import open3d as o3d
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from point_cloud_utils import get_clusters_from_labels, get_knn_clusters
+from point_cloud_utils import get_clusters_from_labels, \
+                              get_knn_clusters, \
+                              get_axis_aligned_bbox
 
 
 # =============================================================================
@@ -109,59 +111,17 @@ o3d.visualization.draw_geometries(clusters)
 ## CHALLENGE 5 - BOUNDING BOXES IN 3D
 # bounding_boxes = 
 
+# get bounding box for each cluster
+cluster_bboxes = []
+for cluster in clusters:
+    cluster_bboxes.append(get_axis_aligned_bbox(cluster))
 
-
-pcd_o3d = o3d.utility.Vector3dVector(np.asarray(outlier_cloud.points))
-bbox = o3d.geometry.OrientedBoundingBox.create_from_points(pcd_o3d)
-oriented_bbox = bbox.get_oriented_bounding_box()
-
-# draw bounding box
-# need to get bounding box corner points
-
-# helper array for speed hack!
-i_arr = np.array([
-    [1, 1, 1],
-    [1, 1, -1],
-    [1, -1, 1],
-    [1, -1, -1],
-    [-1, 1, 1],
-    [-1, 1, -1],
-    [-1, -1, 1],
-    [-1, -1,- 1]
-    ])
-
-points = oriented_bbox.center + oriented_bbox.extent*i_arr
-
-
-# then get lines?
-lines = [[0, 1], [0, 2], [1, 3], [2, 3], 
-         [4, 5], [4, 6], [5, 7], [6, 7],
-         [0, 4], [1, 5], [2, 6], [3, 7]]
-
-# then put them together
-line_set = o3d.geometry.LineSet()
-line_set.points = o3d.utility.Vector3dVector(points)
-line_set.lines = o3d.utility.Vector2iVector(lines)
-line_set.colors = o3d.utility.Vector3dVector(colors)
+# combine lists for visualizations
+combined_pcd = [outlier_cloud] + [inlier_cloud] + clusters + cluster_bboxes
 
 # visualize
-o3d.visualization.draw_geometries([outlier_cloud, inlier_cloud, line_set])
+o3d.visualization.draw_geometries(combined_pcd)
 
-# then draw the box
-
-# TEMP
-points = [[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0], [0, 0, 1], [1, 0, 1],
-          [0, 1, 1], [1, 1, 1]]
-lines = [[0, 1], [0, 2], [1, 3], [2, 3], [4, 5], [4, 6], [5, 7], [6, 7],
-         [0, 4], [1, 5], [2, 6], [3, 7]]
-colors = [[1, 0, 0] for i in range(len(lines))]
-line_set = o3d.geometry.LineSet()
-line_set.points = o3d.utility.Vector3dVector(points)
-line_set.lines = o3d.utility.Vector2iVector(lines)
-line_set.colors = o3d.utility.Vector3dVector(colors)
-o3d.visualization.draw_geometries([line_set])
-    
-    
 
 '''
 ## CHALLENGE 6 - VISUALIZE THE FINAL RESULTS

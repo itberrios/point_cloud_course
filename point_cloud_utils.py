@@ -1,10 +1,10 @@
 """
 Helper functions to get individual clusters
 """
+
 import numpy as np
-import time
+from scipy import stats
 import open3d as o3d
-import pandas as pd
 import matplotlib.pyplot as plt
 
 
@@ -44,10 +44,6 @@ def get_clusters_from_labels(pcd, labels, background_color=[0,0,0]):
         # get cluster color
         color = colors[cluster_idx, :3]
         
-        # don't add unclustered points
-        # if color.sum() == background_color.sum():
-        #     continue
-        
         # get cluster points
         cluster = pcd.select_by_index(cluster_idx)
         
@@ -60,7 +56,7 @@ def get_clusters_from_labels(pcd, labels, background_color=[0,0,0]):
     return clusters
 
 
-def get_knn_clusters(pcd, pcd_tree, max_points=500, ep=2):
+def get_knn_clusters(pcd, pcd_tree, max_clusters=500, ep=2):
     ''' Obtains clusters using a KD Tree and K-Nearest Neighbors.
         steps:
             select a point at random
@@ -69,6 +65,10 @@ def get_knn_clusters(pcd, pcd_tree, max_points=500, ep=2):
                 original point 
             repeat
         Inputs:
+            pcd - open3d PointCloud object
+            pcd_tree - open3d PointCloud KDTreeFlann object
+            max_clusters (int) Maximum number of clusters to find
+            ep=2 (int) maximum distance from center to edge of cluster
         Outputs:
         '''
     
@@ -80,7 +80,7 @@ def get_knn_clusters(pcd, pcd_tree, max_points=500, ep=2):
     # collect clusters in a list
     clusters = []
 
-    for i in range(max_points):
+    for i in range(max_clusters):
 
         # get a random point and color
         rand_point = points_arr[np.random.randint(0, len(search_space)), :]
@@ -106,4 +106,104 @@ def get_knn_clusters(pcd, pcd_tree, max_points=500, ep=2):
             break
         
     return clusters
+
+
+def get_oriented_bbox_OLD(pcd):
+    ''' Function to obtain oriented bounding box for a given cluster 
+        Inputs:
+            pcd - open3d PointCloud object
+        Outputs:
+            bbox_out - open3d LineSet object that contains the bounding box
+    '''
+    pcd_o3d = o3d.utility.Vector3dVector(np.asarray(pcd.points))
+    bbox = o3d.geometry.OrientedBoundingBox.create_from_points(pcd_o3d)
+    oriented_bbox = bbox.get_oriented_bounding_box()
+
+    # get bounding box corner points
+    # use helper array 
+    i_arr = np.array([
+        [1, 1, 1],
+        [1, 1, -1],
+        [1, -1, 1],
+        [1, -1, -1],
+        [-1, 1, 1],
+        [-1, 1, -1],
+        [-1, -1, 1],
+        [-1, -1, -1]
+        ])
+
+    points = oriented_bbox.center + oriented_bbox.extent*i_arr
+
+    # then get lines (order is based on helper array i_arr)
+    lines = [[0, 1], [0, 2], [1, 3], [2, 3], 
+             [4, 5], [4, 6], [5, 7], [6, 7],
+             [0, 4], [1, 5], [2, 6], [3, 7]]
+
+    # get LineSet for bounding box
+    color = stats.mode(np.asarray(pcd.colors))[0].squeeze()
+
+    bbox_out = o3d.geometry.LineSet()
+    bbox_out.points = o3d.utility.Vector3dVector(points)
+    bbox_out.lines = o3d.utility.Vector2iVector(lines)
+    bbox_out.paint_uniform_color(color)
     
+    return bbox_out
+  
+  
+def get_axis_aligned_bbox_OLD(pcd):
+    ''' Function to obtain axis_aligned bounding box for a given cluster 
+        Inputs:
+            pcd - open3d PointCloud object
+        Outputs:
+            bbox_out - open3d LineSet object that contains the bounding box
+    '''
+    pcd_o3d = o3d.utility.Vector3dVector(np.asarray(pcd.points))
+    bbox = o3d.geometry.OrientedBoundingBox.create_from_points(pcd_o3d)
+    ax_aligned_bbox = bbox.get_axis_aligned_bounding_box()
+
+    # get bounding box corner points
+    # use helper array
+    i_arr = np.array([
+        [0, 0, 0],
+        [0, 0, 1],
+        [0, 1, 0],
+        [0, 1, 1],
+        [1, 0, 0],
+        [1, 0, 1],
+        [1, 1, 0],
+        [1, 1, 1]
+        ])
+
+    points = ax_aligned_bbox.max_bound*np.flipud(i_arr) \
+             + ax_aligned_bbox.min_bound*i_arr
+
+    # then get lines (order is based on helper array i_arr)
+    lines = [[0, 1], [0, 2], [1, 3], [2, 3], 
+             [4, 5], [4, 6], [5, 7], [6, 7],
+             [0, 4], [1, 5], [2, 6], [3, 7]]
+
+    # get LineSet for bounding box
+    color = stats.mode(np.asarray(pcd.colors))[0].squeeze()
+
+    bbox_out = o3d.geometry.LineSet()
+    bbox_out.points = o3d.utility.Vector3dVector(points)
+    bbox_out.lines = o3d.utility.Vector2iVector(lines)
+    bbox_out.paint_uniform_color(color)
+    
+    return bbox_out
+
+def get_axis_aligned_bbox(pcd):
+    ''' Function to obtain axis_aligned bounding box for a given cluster 
+        Inputs:
+            pcd - open3d PointCloud object
+        Outputs:
+            bbox_out - open3d AxisAlignedBoundingBox object
+    '''
+    # get bounding box
+    bbox_out = pcd.get_axis_aligned_bounding_box()
+
+    # paint bounding box
+    color = stats.mode(np.asarray(pcd.colors))[0].squeeze()
+    bbox_out.color = color
+    
+    return bbox_out
