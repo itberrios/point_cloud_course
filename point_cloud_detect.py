@@ -2,7 +2,8 @@
 Script to detect objects in a point cloud
 The supported extension names are: pcd, ply, xyz, xyzrgb, xyzn, pts.
 
-usage
+usages:
+    python point_cloud_detect --pcd_path path/to/file.pcd
 
 This script uses unsupervised learning to segment the point cloud and find
 objects of interest. It does this in 6 main steps
@@ -30,23 +31,51 @@ import open3d as o3d
 from point_cloud_utils import get_clusters_from_labels, \
                               get_axis_aligned_bbox
 
-# variables to be added to argparser
+# parse arguments
+ap = argparse.ArgumentParser()
+ap.add_argument('--pcd_path', type=str, help='Path to .pcd file')
+ap.add_argument('--voxel_size', type=float, default=0.1, 
+                help='Voxel Size for down sampling')
+ap.add_argument('--ransac_dist_thresh', type=float, default=0.25,
+                help='RANSAC segmentation distance threshold')
+ap.add_argument('--ransac_iters', type=int, default=500,
+                help='RANSAC segmentation iterations')
+ap.add_argument('--ransac_n', type=int, default=3,
+                help='min points to define a plane, best left at 3 or 4')
+ap.add_argument('--dbscan_eps', type=float, default=0.5,
+                help='DBSCAN cluster neighborhood distance')
+ap.add_argument('--min_clust', type=int, default=30,
+                help='minimum points required to declare a cluster')
+ap.add_argument('--max_clust', type=int, default=2000,
+                help='mmaximum points to declare a cluster')
+
+
+args = vars(ap.parse_args())
+
 # 
 # 0 
-pcd_path = r'test_files\sdc.pcd'
-# 1 - voxel downsampling
-voxel_size = 0.15
-# 2 - RANSAC segmentation
-ransac_dist_thresh = 0.25
-ransac_iters = 500
-ransac_n = 3
-# 3 DBSCAN 
-dbscan_eps = 0.5
-min_points = 12
+# pcd_path = r'test_files\sdc.pcd'
+# # 1 - voxel downsampling
+# voxel_size = 0.15
+# # 2 - RANSAC segmentation
+# ransac_dist_thresh = 0.25
+# ransac_iters = 500
+# ransac_n = 3
+# # 3 DBSCAN 
+# dbscan_eps = 0.5
+# min_clust = 30
 
-# 6 visualize
-min_clust = 30
-max_clust = 2000
+# # 6 visualize
+# max_clust = 2000
+
+pcd_path = args['pcd_path']
+voxel_size = args['voxel_size']
+ransac_dist_thresh = args['ransac_dist_thresh']
+ransac_iters = args['ransac_iters']
+ransac_n = args['ransac_n']
+dbscan_eps = args['dbscan_eps']
+min_clust = args['min_clust']
+max_clust = args['max_clust']
 
 tic = time.time()
 
@@ -77,7 +106,7 @@ outlier_cloud = pcd.select_by_index(inliers, invert=True)
 with o3d.utility.VerbosityContextManager(
         o3d.utility.VerbosityLevel.Debug) as cm:
     labels = np.array(outlier_cloud.cluster_dbscan(eps=dbscan_eps, 
-                                                   min_points=min_points, 
+                                                   min_points=min_clust, 
                                                    print_progress=False))
 # get indiviudal clusters from the labels
 cluster_labels, clusters = get_clusters_from_labels(
