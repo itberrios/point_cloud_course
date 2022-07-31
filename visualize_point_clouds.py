@@ -15,10 +15,6 @@ import open3d as o3d
 import pptk
 
 
-# TEMP
-# pcd_path = r'C:\Users\itber\Documents\learning\think_autonomous_main\point_cloud_course\test_files\n008-2018-08-01-15-16-36-0400__LIDAR_TOP__1533151605047769.pcd'
-
-
 def main(pcd_path, viz):
     print('Loading Point Cloud... \n')
     if os.path.exists(pcd_path):
