@@ -1,7 +1,7 @@
 """
 Helper functions to get individual clusters
 """
-
+import copy
 import numpy as np
 from scipy import stats
 import open3d as o3d
@@ -9,30 +9,30 @@ import matplotlib.pyplot as plt
 
 
 
-def get_clusters_from_labels(pcd, labels, background_color=[0,0,0]):
+def get_clusters_from_labels(pcd, labels, include_outliers=True):
     ''' Obtains a list of individual cluster point clouds and paints them 
         unique colors. Assumes that the pcd object has a uniform color.
         Inputs:
             pcd - open3d PointCloud object
             labels - (Nx1 array) labels for each point in the cluster
-            background_color - (lust/array) original background color of pcd
+            include_outliers - (_Bool) determines whether outlaiers should be 
+                               included in the output list
         Outputs:
+            unique_labels (list) Contains all labels for each cluster
             clusters (list) Contains PointCloud objects for each color
         '''
-    # sanitize inputs
-    if not isinstance(background_color, np.ndarray):
-        background_color = np.array(background_color)
-        
     # get colors 
     max_label = labels.max()
     colors = plt.get_cmap('tab20')
     colors = colors(labels/(max_label if max_label > 0 else 1))
     colors[labels < 0] = 0
     
-    # get unique labels and remove -1 (unclustered label)
-    unique_labels = np.unique(labels)
-    unique_labels = unique_labels[unique_labels != -1]
+    unique_labels = np.sort(np.unique(labels))
     
+    # remove -1 (unclustered label) if outliers are not permitted
+    if not include_outliers:
+        unique_labels = unique_labels[unique_labels != -1]
+
     # store cluster point clouds in a list
     clusters = []
     
@@ -53,7 +53,7 @@ def get_clusters_from_labels(pcd, labels, background_color=[0,0,0]):
         # append to list
         clusters.append(cluster)
     
-    return clusters
+    return unique_labels, clusters
 
 
 def get_knn_clusters(pcd, pcd_tree, max_clusters=500, ep=2):
