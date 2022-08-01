@@ -51,7 +51,7 @@ def get_clusters_from_labels(pcd, labels):
     return clusters
 
 
-def point_cloud_detect(pcd, voxel_size=0.1, ransac_dist_thresh=0.25, 
+def fast_point_cloud_detect(pcd, voxel_size=0.1, ransac_dist_thresh=0.25, 
                        ransac_iters=500, ransac_n=3, dbscan_eps=0.5, 
                        min_clust=30, max_clust=2000):
     ''' Detects objects in a point cloud file
@@ -133,7 +133,7 @@ def main():
     pcd = o3d.io.read_point_cloud(pcd_path)
     
     tic = time.time()
-    cluster_bboxes = point_cloud_detect(pcd, voxel_size=0.15, 
+    cluster_bboxes = fast_point_cloud_detect(pcd, voxel_size=0.15, 
                        ransac_dist_thresh=0.25, ransac_iters=150, ransac_n=3, 
                        dbscan_eps=0.5, min_clust=30, max_clust=2000)
 
