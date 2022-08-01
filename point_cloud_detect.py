@@ -49,25 +49,9 @@ ap.add_argument('--min_clust', type=int, default=30,
 ap.add_argument('--max_clust', type=int, default=2000,
                 help='mmaximum points to declare a cluster')
 
-
 args = vars(ap.parse_args())
 
-# 
-# 0 
-# pcd_path = r'test_files\sdc.pcd'
-# # 1 - voxel downsampling
-# voxel_size = 0.15
-# # 2 - RANSAC segmentation
-# ransac_dist_thresh = 0.25
-# ransac_iters = 500
-# ransac_n = 3
-# # 3 DBSCAN 
-# dbscan_eps = 0.5
-# min_clust = 30
-
-# # 6 visualize
-# max_clust = 2000
-
+# gather args
 pcd_path = args['pcd_path']
 voxel_size = args['voxel_size']
 ransac_dist_thresh = args['ransac_dist_thresh']

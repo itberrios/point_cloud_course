@@ -1,7 +1,6 @@
 """
 Helper functions to get individual clusters
 """
-import copy
 import numpy as np
 from scipy import stats
 import open3d as o3d
@@ -28,7 +27,7 @@ def get_clusters_from_labels(pcd, labels, include_outliers=True):
     
     unique_labels = np.sort(np.unique(labels))
     
-    # remove -1 (unclustered label) if outliers are not permitted
+    # remove -1 (unclustered label) to remove outliers if desired
     if not include_outliers:
         unique_labels = unique_labels[unique_labels != -1]
 
