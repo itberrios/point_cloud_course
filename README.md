@@ -52,3 +52,16 @@ http://www.open3d.org/docs/0.7.0/getting_started.html#id2
 ## DOCUMENTATION
 The course uses the documentation provided by [Open 3D](http://www.open3d.org/docs/release/tutorial/Basic/pointcloud.html)
 
+Supported extensions for point cloud visualization are: pcd, ply, xyz, xyzrgb, xyzn, pts. To use the point cloud viewer, just pass the full path to the point cloud file:
+```
+python visualize_point_cloud.py --pcd_path path --viz open3d
+```
+or to view with pptk
+```
+python visualize_point_cloud.py --pcd_path path --viz pptk
+```
+
+To detect objects in a point cloud and draw bounding boxes:
+```
+python point_cloud_detect --pcd_path path/to/file.pcd
+```
