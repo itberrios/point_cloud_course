@@ -3,6 +3,9 @@ Visualize Point clouds
 
 Requires Python 3.7, open3d, and pptk (only supported up to Python 3.7)
 
+Supported Extensions are:
+    pcd, ply, xyz, xyzrgb, xyzn, pts
+
 Usages: 
     python visualize_point_cloud.py --pcd_path path
     python visualize_point_cloud.py --pcd_path path --viz open3d

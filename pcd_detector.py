@@ -97,12 +97,14 @@ for pcd_path in pcd_paths:
     
 # save images to video
 img = cv2.imread(save_paths[0])
-height,width,depth = img.shape
+height, width = img.shape[:2]
+height, width = height//2, width//2
 video = cv2.VideoWriter(VIDEO_PATH, cv2.VideoWriter_fourcc(*'DIVX'), 
                         15, (width,height))
 
 for save_path in save_paths:
-    video.write(cv2.imread(save_path))
+    video.write(cv2.resize(cv2.imread(save_path), (width,height), 
+                           cv2.INTER_LANCZOS4))
 
 cv2.destroyAllWindows()
 video.release()
