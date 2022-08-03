@@ -74,3 +74,7 @@ The goal of the course project was to use unsupervised learning to segment and d
 5) Obtain bounding boxes for each clustered object with correct axis alignment obtained in step 4 (open3d handles steps 4 and 5 with 'get_axis_aligned_bbox(pcd)')
 
 The results of the detection algorithm are show below:
+
+
+https://user-images.githubusercontent.com/60835780/182620858-40548fff-5fa9-41fe-a04f-e3e64b233901.mp4
+
