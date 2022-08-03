@@ -12,7 +12,11 @@ import os
 import sys
 import argparse
 import open3d as o3d
-import pptk
+
+try:
+    import pptk
+except ModuleNotFoundError as err:
+    print(err)
 
 
 def main(pcd_path, viz):
@@ -26,8 +30,9 @@ def main(pcd_path, viz):
         
     print(pcd)
     # print(np.asarray(pcd.points))
-
-    if viz == 'pptk':
+    
+    # check that pptk was imported
+    if (viz == 'pptk') and ('pptk' in sys.modules):
         pptk.viewer(pcd.points)
     else:
         # use open3d as default

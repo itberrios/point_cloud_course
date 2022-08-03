@@ -25,6 +25,8 @@ import open3d as o3d
 def get_clusters_from_labels(pcd, labels):
     ''' Obtains a list of individual cluster point clouds and paints them 
         unique colors. Assumes that the pcd object has a uniform color.
+        
+        NOTE: This is barely faster but seems a bit nicer
         Inputs:
             pcd - open3d PointCloud object
             labels - (Nx1 array) labels for each point in the cluster
@@ -38,16 +40,10 @@ def get_clusters_from_labels(pcd, labels):
     
     # remove -1 (unclustered label) to remove outliers
     unique_labels = unique_labels[unique_labels != -1]
+    
+    w = lambda a : np.where(a == labels)[0]
+    clusters = list(map(pcd.select_by_index, map(w, unique_labels)))
 
-    # store cluster point clouds in a list
-    clusters = []
-    
-    # iterate through each unique label
-    for label in unique_labels:
-        # get cluster points
-        clusters.append(pcd.select_by_index(np.where(label == labels)[0]))
-    
-    
     return clusters
 
 
@@ -103,15 +99,15 @@ def fast_point_cloud_detect(pcd, voxel_size=0.1, ransac_dist_thresh=0.25,
     
     
     # =========================================================================
-    # 3 - Use DBSCAN to detect objects 
+    # 3 - Use DBSCAN to detect objects
     labels = np.array(outlier_cloud.cluster_dbscan(eps=dbscan_eps, 
                                                    min_points=min_clust, 
                                                    print_progress=False))
     # get indiviudal clusters from the labels
-    clusters = get_clusters_from_labels(outlier_cloud,
-                                        labels)
-     
-    
+    # tic = time.time()
+    clusters = get_clusters_from_labels(outlier_cloud, labels)
+    # toc = time.time()
+    # print(f'time to get clusters from labels: {toc - tic}')
     
     # =========================================================================
     # 4/5 - get 3D bounding boxes

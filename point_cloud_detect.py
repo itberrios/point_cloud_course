@@ -100,11 +100,15 @@ def point_cloud_detect(pcd, voxel_size=0.1, ransac_dist_thresh=0.25,
                                                    min_points=min_clust, 
                                                    print_progress=False))
     # get indiviudal clusters from the labels
+    tic = time.time()
     cluster_labels, clusters = get_clusters_from_labels(
                                         outlier_cloud, 
                                         labels, 
                                         include_outliers=True)
-     
+    toc = time.time()
+    print(f'time to get clusters from labels: {toc - tic}')
+    
+    
     # get unclustered points and set their color to gray
     unclustered = clusters[np.where(cluster_labels == -1)[0][0]]
     unclustered.paint_uniform_color([0.5, 0.5, 0.5])
