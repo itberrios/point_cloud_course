@@ -65,3 +65,12 @@ To detect objects in a point cloud and draw bounding boxes:
 ```
 python point_cloud_detect --pcd_path path/to/file.pcd
 ```
+## Projects
+The goal of the course project was to use unsupervised learning to segment and detect objects in a 3D point cloud. The process to do this outlined in the following steps:
+1) Perform Voxel Downsampling to decrease the total number of points
+2) Perform planar segmentation via RANSAC to determine the surface  VS all other parts of the point cloud
+3) Perform DBSCAN clustering to find objects of interest
+4) Use PCA to find the axial orienation of each clustered object (Axial orientation relative to the origin i.e. 1st principle component)
+5) Obtain bounding boxes for each clustered object with correct axis alignment obtained in step 4 (open3d handles steps 4 and 5 with 'get_axis_aligned_bbox(pcd)')
+
+The results of the detection algorithm are show below:
